@@ -32,7 +32,7 @@ class UserType extends AbstractType
             ->add('password', RepeatedType::class, [
                 'type' => PasswordType::class,
                 'label' => 'Mot de passe',
-                'mapped' => false,
+                'mapped' => true,
                 'first_options' => ['label' => 'Password', 'attr' => [
                     'class'=> 'form-control'
                 ]],

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\GeneratedValue;
@@ -30,14 +31,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private string $email;
 
     #[Column(type: 'string', nullable: false)]
-    #[Assert\NotBlank, Assert\PasswordStrength]
+    #[Assert\NotBlank]
     private string $password;
 
     #[Column(type: 'json')]
     #[Assert\NotBlank]
     private array $roles = ['ROLE_USER'];
 
-    #[Column(type: 'datetime', nullable: false)]
+    #[Column(type: Types::DATETIME_IMMUTABLE, nullable: false)]
     private \DateTimeImmutable $createdAt;
 
     public function __construct()

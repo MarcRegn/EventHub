@@ -5,6 +5,7 @@ namespace App\Controller\User;
 use App\Entity\User;
 use App\Form\User\UserType;
 use App\Repository\UserRepository;
+use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,6 +26,19 @@ class RegisterUserController
                              FormFactoryInterface $formFactory): Response{
         $user = new User();
         $form = $formFactory->create(UserType::class, $user);
+
+
+        $form->handleRequest($request);
+        try {
+            if ($form->isSubmitted() && $form->isValid()) {
+                $hashedPassword = $passwordHasher->hashPassword($user, $form->get('password')->get('first')->getData());
+
+                $user->setPassword($hashedPassword);
+                $user = $form->getData();
+                $userRepository->persistAndSave($user);
+            }
+        } catch (LogicException $e){
+        }
 
         return new Response($twig->render('user/register.html.twig', [
             'form' => $form->createView()
