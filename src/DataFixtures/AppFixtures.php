@@ -1,0 +1,80 @@
+<?php
+
+namespace App\DataFixtures;
+
+use App\Entity\Category;
+use App\Entity\Event;
+use App\Entity\User;
+use App\Enum\EventStatus;
+use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Persistence\ObjectManager;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+
+class AppFixtures extends Fixture
+{
+    public function __construct(
+        private readonly UserPasswordHasherInterface $hasher
+    ) {
+    }
+
+    public function load(ObjectManager $manager):void{
+        $admin = $this->user($manager, 'admin', 'admin@eventhub.test', 'azerty', ['ROLE_ADMIN']
+        );
+
+        $organizer = $this->user($manager, 'organizer', 'organizer@eventhub.test', 'azerty', ['ROLE_ORGANIZER']);
+
+        $tech = $this->category($manager, 'Tech', 'tech');
+        $sport = $this->category($manager, 'Sport', 'sport');
+        $music = $this->category($manager, 'Music', 'music');
+
+
+        $this->event($manager, 'Symfony Conference', 'symfony-conference', 'Evenement Symfony', $organizer, $tech, EventStatus::Published);
+
+        $this->event($manager, 'Tournoi FIFA', 'tournoi-fifa', 'Competition e-sport', $organizer, $sport, EventStatus::Draft);
+
+        $this->event(
+            $manager, 'Concert Jazz', 'concert-jazz', 'Concert live', $organizer, $music, EventStatus::Published);
+
+        $manager->flush();
+    }
+
+    private function user(ObjectManager $manager, string $username, string $email, string $password, array $roles){
+
+        $user = new User();
+        $user->setUsername($username);
+        $user->setEmail($email);
+        $user->setRoles($roles);
+        $user->setPassword(
+            $this->hasher->hashPassword($user, $password));
+        $manager->persist($user);
+        return $user;
+    }
+
+    private function category(ObjectManager $manager, string $name, string $slug){
+        $category = new Category();
+        $category->setName($name);
+        $category->setSlug($slug);
+        $manager->persist($category);
+        return $category;
+    }
+
+    private function event(
+        ObjectManager $manager, string $title, string $slug, string $description, User $organizer, Category $category, EventStatus $status){
+
+        $event = new Event();
+        $event->setTitle($title);
+        $event->setSlug($slug);
+        $event->setDescription($description);
+        $event->setOrganizer($organizer);
+        $event->setCategory($category);
+        $event->setStatus($status);
+        $event->setCapacity(100);
+
+        $event->setStartAt(new \DateTimeImmutable('+7 jours'));
+        $event->setEndAt(new \DateTimeImmutable('+7 jours +2 heures'));
+
+        $manager->persist($event);
+
+        return $event;
+    }
+}
