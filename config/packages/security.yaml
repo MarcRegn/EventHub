@@ -8,6 +8,13 @@ security:
             entity:
                 class: App\Entity\User
                 property: email
+    role_hierarchy:
+        ROLE_ADMIN:
+            - ROLE_ORGANIZER
+            - ROLE_USER
+
+        ROLE_ORGANIZER:
+            - ROLE_USER
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
@@ -31,8 +38,10 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-    # - { path: ^/admin, roles: ROLE_ADMIN }
-    # - { path: ^/profile, roles: ROLE_USER }
+     - { path: ^/admin, roles: ROLE_ADMIN }
+     - { path: ^/profile, roles: ROLE_USER }
+     - { path: ^/event/edit, roles: ROLE_ORGANIZER }
+     - { path: ^/create-event, roles: ROLE_ORGANIZER}
 when@test:
     security:
         password_hashers:
@@ -45,3 +54,5 @@ when@test:
                 cost: 4 # Lowest possible value for bcrypt
                 time_cost: 3 # Lowest possible value for argon
                 memory_cost: 10 # Lowest possible value for argon
+
+

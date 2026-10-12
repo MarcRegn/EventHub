@@ -1,0 +1,106 @@
+{% extends '/base.html.twig' %}
+
+{% block title %}{{ parent() }} | Homepage{% endblock %}
+
+{% block body %}
+
+    <div class="container py-5">
+
+        {# En-tête #}
+        <div class="text-center mb-5">
+            <span class="badge bg-primary-subtle text-primary px-3 py-2 mb-3">
+                ÉVÉNEMENTS
+            </span>
+
+            <h1 class="display-5 fw-bold mb-3">
+                Découvrez nos événements
+            </h1>
+
+            <p class="text-muted fs-5 mx-auto" style="max-width: 650px;">
+                Retrouvez tous les événements à venir et ne manquez aucune occasion
+                de participer à des moments exceptionnels.
+            </p>
+        </div>
+
+        {# Liste des événements #}
+        <div class="row g-4">
+
+            {% for event in events %}
+
+                <div class="col-12 col-md-6 col-lg-4">
+
+                    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+
+                        {# Image / Header de la carte #}
+                        <div class="bg-primary d-flex align-items-center justify-content-center"
+                             style="height: 160px;">
+
+                            <span class="text-white display-4">
+                                📅
+                            </span>
+
+                        </div>
+
+                        <div class="card-body p-4 d-flex flex-column">
+
+                            {# Date #}
+                            <div class="mb-3">
+                                <span class="badge bg-light text-primary border">
+                                    {{ event.startAt|date('d/m/Y') }}
+                                </span>
+                            </div>
+
+                            {# Titre #}
+                            <h2 class="h4 fw-bold mb-3">
+                                {{ event.title }}
+                            </h2>
+
+                            {# Heure #}
+                            <p class="text-muted mb-4">
+                                <i class="bi bi-clock me-2"></i>
+                                {{ event.startAt|date('H:i') }}
+                            </p>
+
+                            {# Bouton #}
+                            <div class="mt-auto">
+                                <a href="{{ path('show-event', {id: event.id}) }}"
+                                   class="btn btn-primary rounded-pill px-4">
+                                    Voir les détails
+                                    <span class="ms-2">→</span>
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+            {% else %}
+
+                {# Aucun événement #}
+                <div class="col-12">
+                    <div class="text-center py-5">
+
+                        <div class="display-1 mb-3">
+
+                        </div>
+
+                        <h2 class="h3 fw-bold">
+                            Aucun événement disponible
+                        </h2>
+
+                        <p class="text-muted">
+                            Il n'y a actuellement aucun événement publié.
+                            Revenez bientôt pour découvrir les prochains événements !
+                        </p>
+
+                    </div>
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+{% endblock %}

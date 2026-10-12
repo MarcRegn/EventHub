@@ -1,0 +1,53 @@
+{% extends '/base.html.twig' %}
+
+{% block title %}{{ parent() }} | {{ event.title }}{% endblock %}
+
+{% block body %}
+    <div class="py-4">
+
+        <a href="{{ path('list-event') }}" class="btn btn-link mb-4">
+            ← Retour aux événements
+        </a>
+
+        <div class="card border-0 shadow-sm p-4">
+            <span class="badge badge-light text-primary border mb-3 align-self-start">
+                {{ event.startAt|date('d/m/Y') }}
+            </span>
+
+            <h1 class="font-weight-bold mb-3">{{ event.title }}</h1>
+
+            <p class="text-muted">
+                Début à {{ event.startAt|date('H:i') }}
+            </p>
+
+            <p class="font-weight-bold mb-3">Description : {{ event.description }}</p>
+            <p class="font-weight-bold mb-3">Place(s) disponible(s) : {{ event.capacity }}</p>
+            <p class="font-weight-bold mb-3">Status : {{ event.status.value }}</p>
+
+            {# Bouton d'inscription #}
+            <div class="mb-3">
+                {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                    <form method="post" action="{{ path('register-event', {id: event.id}) }}">
+                        <button type="submit" class="btn btn-success px-4">
+                            S'inscrire à l'événement
+                        </button>
+                    </form>
+                {% else %}
+                    <a href="{{ path('app_login') }}" class="btn btn-outline-primary px-4">
+                        Connectez-vous pour vous inscrire
+                    </a>
+                {% endif %}
+            </div>
+
+            {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_ORGANIZER') %}
+                <div class="mt-auto">
+                    <a href="{{ path('edit-event', {id: event.id}) }}"
+                       class="btn btn-primary px-4">
+                        Modifier l'événement
+                        <span class="ml-2">→</span>
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

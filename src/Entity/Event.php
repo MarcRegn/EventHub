@@ -26,7 +26,7 @@ class Event
     private string $title;
 
     #[Column(type: 'string', length: 255, unique: true, nullable: false)]
-    #[Assert\NotBlank,Assert\Type('string')]
+    #[Assert\Type('string')]
     private string $slug;
 
     #[Column(type: 'text', nullable: false)]
@@ -90,7 +90,7 @@ class Event
         return $this->title;
     }
 
-    public function setTitle(string $title)
+    public function setTitle(string $title): static
     {
         $this->title = $title;
         return $this;
