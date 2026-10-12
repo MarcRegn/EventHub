@@ -6,9 +6,12 @@ use App\Entity\Category;
 use App\Entity\Event;
 use App\Entity\User;
 use App\Enum\EventStatus;
+use App\Enum\RoleUser;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use App\Entity\Registration;
+use App\Enum\RegistrationStatus;
 
 class AppFixtures extends Fixture
 {
@@ -18,22 +21,24 @@ class AppFixtures extends Fixture
     }
 
     public function load(ObjectManager $manager):void{
-        $admin = $this->user($manager, 'admin', 'admin@eventhub.test', 'azerty', ['ROLE_ADMIN']
+        $admin = $this->user($manager, 'admin', 'admin@eventhub.test', 'azerty', [RoleUser::Admin]
         );
 
-        $organizer = $this->user($manager, 'organizer', 'organizer@eventhub.test', 'azerty', ['ROLE_ORGANIZER']);
+        $organizer1 = $this->user($manager, 'organizer', 'organizer@eventhub.test', 'azerty', [RoleUser::Organisateur]);
+        $organizer2 = $this->user($manager, 'organizer2', 'organizer2@eventhub.test', 'azerty', [RoleUser::Organisateur]);
+        $user = $this->user($manager, 'user', 'user@eventhub.test', 'azerty', [RoleUser::User]);
 
         $tech = $this->category($manager, 'Tech', 'tech');
         $sport = $this->category($manager, 'Sport', 'sport');
         $music = $this->category($manager, 'Music', 'music');
 
 
-        $this->event($manager, 'Symfony Conference', 'symfony-conference', 'Evenement Symfony', $organizer, $tech, EventStatus::Published);
+        $symfonyConf = $this->event($manager, 'Symfony Conference', 'symfony-conference', 'Evenement Symfony', $organizer1, $tech, EventStatus::Published);
+        $tournoiFifa = $this->event($manager, 'Tournoi FIFA', 'tournoi-fifa', 'Competition e-sport', $organizer2, $sport, EventStatus::Draft);
+        $concertJazz = $this->event($manager, 'Concert Jazz', 'concert-jazz', 'Concert live', $organizer2, $music, EventStatus::Published);
 
-        $this->event($manager, 'Tournoi FIFA', 'tournoi-fifa', 'Competition e-sport', $organizer, $sport, EventStatus::Draft);
-
-        $this->event(
-            $manager, 'Concert Jazz', 'concert-jazz', 'Concert live', $organizer, $music, EventStatus::Published);
+        $this->registration($manager, $user, $symfonyConf);
+        $this->registration($manager, $user, $concertJazz);
 
         $manager->flush();
     }
@@ -70,11 +75,21 @@ class AppFixtures extends Fixture
         $event->setStatus($status);
         $event->setCapacity(100);
 
-        $event->setStartAt(new \DateTimeImmutable('+7 jours'));
-        $event->setEndAt(new \DateTimeImmutable('+7 jours +2 heures'));
+        $event->setStartAt(new \DateTimeImmutable('+7 days'));
+        $event->setEndAt(new \DateTimeImmutable('+7 days +2 hours'));
 
         $manager->persist($event);
 
         return $event;
+    }
+    private function registration(ObjectManager $manager, User $user, Event $event, RegistrationStatus $status = RegistrationStatus::Confirmed):
+    Registration {
+        $registration = new Registration();
+        $registration->setUser($user);
+        $registration->setEvent($event);
+        $registration->setStatus($status);
+        $manager->persist($registration);
+
+        return $registration;
     }
 }
